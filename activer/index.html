@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Activer</title>
+  <style>
+    body { background: #333; color: #ccc; }
+  </style>
+</head>
+<body>
+  <label>
+    スリープ抑止する時間（分）
+    <input type="number" id="duration" min="1" value="30">
+  </label>
+  <p id="status"></p>
+
+  <script>
+    const durationInput = document.getElementById('duration');
+    const statusEl = document.getElementById('status');
+
+    let wakeLock = null;
+    let releaseTimer = null;
+
+    async function start() {
+      const minutes = parseInt(durationInput.value, 10);
+      if (!minutes || minutes < 1) return;
+
+      try {
+        wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release', () => { statusEl.textContent = '停止'; });
+      } catch (err) {
+        statusEl.textContent = `取得失敗: ${err.message}`;
+        return;
+      }
+
+      const end = new Date(Date.now() + minutes * 60 * 1000);
+      const hh = String(end.getHours()).padStart(2, '0');
+      const mm = String(end.getMinutes()).padStart(2, '0');
+      statusEl.textContent = `${hh}:${mm} に停止`;
+
+      releaseTimer = setTimeout(() => wakeLock.release(), minutes * 60 * 1000);
+    }
+
+    durationInput.addEventListener('change', () => {
+      clearTimeout(releaseTimer);
+      if (wakeLock) wakeLock.release();
+      start();
+    });
+
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState === 'visible' && wakeLock?.released === false) {
+        wakeLock = await navigator.wakeLock.request('screen').catch(() => null);
+      }
+    });
+
+    start();
+  </script>
+</body>
+</html>
