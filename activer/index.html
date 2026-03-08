@@ -21,35 +21,43 @@
     let wakeLock = null;
     let releaseTimer = null;
 
+    function stop() {
+      clearTimeout(releaseTimer);
+      wakeLock?.release();
+    }
+
     async function start() {
       const minutes = parseInt(durationInput.value, 10);
       if (!minutes || minutes < 1) return;
 
       try {
         wakeLock = await navigator.wakeLock.request('screen');
-        wakeLock.addEventListener('release', () => { statusEl.textContent = '停止'; });
       } catch (err) {
         statusEl.textContent = `取得失敗: ${err.message}`;
         return;
       }
 
-      const end = new Date(Date.now() + minutes * 60 * 1000);
+      const ms = minutes * 60 * 1000;
+      const end = new Date(Date.now() + ms);
       const hh = String(end.getHours()).padStart(2, '0');
       const mm = String(end.getMinutes()).padStart(2, '0');
       statusEl.textContent = `${hh}:${mm} に停止`;
 
-      releaseTimer = setTimeout(() => wakeLock.release(), minutes * 60 * 1000);
+      releaseTimer = setTimeout(() => {
+        stop();
+        statusEl.textContent = '停止';
+      }, ms);
     }
 
     durationInput.addEventListener('change', () => {
-      clearTimeout(releaseTimer);
-      if (wakeLock) wakeLock.release();
+      stop();
       start();
     });
 
-    document.addEventListener('visibilitychange', async () => {
-      if (document.visibilityState === 'visible' && wakeLock?.released === false) {
-        wakeLock = await navigator.wakeLock.request('screen').catch(() => null);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        stop();
+        start();
       }
     });
 
