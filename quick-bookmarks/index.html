@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Bookmarks</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Quick Bookmarks</h1>
+<input type="text" id="search-box" placeholder="Search bookmarks..." autocomplete="off" />
+<ul id="bookmark-list"></ul>
+
+<div class="actions">
+  <button id="btn-add">+ Add</button>
+  <button id="btn-export">Export</button>
+  <button id="btn-import">Import</button>
+  <button id="btn-reset">Reset to defaults</button>
+</div>
+<div class="hint">Arrow keys to navigate, Enter to open</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2 id="modal-title">Add Bookmark</h2>
+    <label for="modal-name">Name</label>
+    <input type="text" id="modal-name" placeholder="e.g. GitHub" />
+    <label for="modal-url">URL</label>
+    <input type="text" id="modal-url" placeholder="e.g. https://github.com" />
+    <div class="modal-actions">
+      <button id="modal-cancel">Cancel</button>
+      <button id="modal-save" class="primary">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Data Modal (Export / Import) -->
+<div class="modal-overlay" id="data-modal">
+  <div class="modal">
+    <h2 id="data-modal-title">Export</h2>
+    <textarea id="data-textarea" rows="10" spellcheck="false"></textarea>
+    <div class="modal-actions">
+      <button id="data-cancel">Cancel</button>
+      <button id="data-copy" class="primary" style="display:none">Copy</button>
+      <button id="data-confirm" class="primary" style="display:none">Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Confirm Modal -->
+<div class="modal-overlay" id="reset-modal">
+  <div class="modal">
+    <h2>Reset to defaults?</h2>
+    <p class="reset-warning">Custom bookmarks will be lost.</p>
+    <div class="modal-actions">
+      <button id="reset-cancel">Cancel</button>
+      <button id="reset-confirm" class="danger">Reset</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
